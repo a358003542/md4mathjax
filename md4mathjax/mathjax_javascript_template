@@ -1,0 +1,16 @@
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [["$$", "$$"], ['\\[', '\\]']],
+    packages: {
+      '[+]': ['mhchem']
+    }
+  },
+  loader: {
+    load: ['[tex]/mhchem']
+  },
+}
+</script>
+
+<script id="MathJax-script" async src="{{SRC}}"></script>

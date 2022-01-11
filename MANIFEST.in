@@ -1,0 +1,11 @@
+include *.txt
+include *.md
+include *.rst
+include LICENSE
+include pyproject.toml
+include .gitignore
+include setup.cfg
+include md4mathjax/mathjax_javascript_template
+recursive-include tests *.py
+
+

@@ -1,0 +1,32 @@
+
+    <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>MathJax example</title>
+</head>
+<body>
+<h2>mathjax example</h2>
+<p>When <span class="math">$a \ne 0$</span>, there are two solutions to <span class="math">$ax^2 + bx + c = 0$</span> and they are
+  <div class="math">$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</div>
+</p>
+<hr />
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [["$$", "$$"], ['\\[', '\\]']],
+    packages: {
+      '[+]': ['mhchem']
+    }
+  },
+  loader: {
+    load: ['[tex]/mhchem']
+  },
+}
+</script>
+
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
+</body>
+</html>
