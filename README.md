@@ -1,10 +1,6 @@
 # md4mathjax
 this is a python-markdown extension. basicly learning from the pelican plugin render-math. and i think inside its code, the mathjax extension split would be better.
 
-This Extension is writing in the Python-Markdown Recommend way, so basically it's usage can reference the Python-Markdown Extension Usage document. 
-
-本插件在写法是Python-Markdown的统一写法，因此使用可以参看Python-Markdown的插件使用文档。
-
 原插件做了很多额外的工作，但现在mathjax对于数学公式写法上的支持已经很强大了，很多额外的工作都是没有必要的了。
 
 本插件做的两个工作一就是检测markdown文档里面是否有数学公式，如果有则插入下面这段js代码。
@@ -36,7 +32,10 @@ window.MathJax = {
 很简单直观的一个插件，同时又完成了必要的工作。tests文件夹下可以有输出html文件参考。
 
 ## Usage
-插件
+This Extension is writing in the Python-Markdown Recommend way, so basically it's usage can reference the Python-Markdown Extension Usage document. 
+
+本插件在写法是Python-Markdown的统一写法，因此使用可以参看Python-Markdown的插件使用文档。
+
 
 ## 参数
 - auto_insert 默认True 是否根据文章有否数学公式来添加mathjax
