@@ -2,11 +2,26 @@
 # -*-coding:utf-8-*-
 
 import os
-import xml.etree.ElementTree as etree
-from markdown.postprocessors import Postprocessor
+import xml.etree.ElementTree as ET
+
+from markdown.treeprocessors import Treeprocessor
 from markdown.inlinepatterns import InlineProcessor
 from markdown.extensions import Extension
-from jinja2 import Template
+
+DEFUALT_MATHJAX_SETTING = """
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [["$$", "$$"], ['\\[', '\\]']],
+    packages: {
+      '[+]': ['mhchem']
+    }
+  },
+  loader: {
+    load: ['[tex]/mhchem']
+  },
+}
+"""
 
 
 class MathJaxInlinePattern(InlineProcessor):
@@ -19,7 +34,7 @@ class MathJaxInlinePattern(InlineProcessor):
         self.tag = tag
 
     def handleMatch(self, m, data):
-        el = etree.Element(self.tag)
+        el = ET.Element(self.tag)
         el.set('class', self.extension.getConfig('tag_class'))
 
         if self.tag == 'div':
@@ -32,8 +47,12 @@ class MathJaxInlinePattern(InlineProcessor):
         return el, m.start(0), m.end(0)
 
 
-class MathJaxAddJavaScript(Postprocessor):
+class MathJaxAddJavaScript(Treeprocessor):
     """
+    the first version used the Postprocessor class
+    but currently the toc extension called it, so here use the
+    Treeprocessor do the add job
+
     Add Mathjax JavaScript
     """
 
@@ -41,34 +60,27 @@ class MathJaxAddJavaScript(Postprocessor):
         super().__init__(md=extension.md)
         self.extension = extension
 
-    def run(self, text):
+    def run(self, root):
+        """
+        """
         # If no mathjax was present, then exit
         if not self.extension.mathjax_needed:
-            return text
+            return root
+
+        mathjax_script_settings = ET.Element("script")
+        mathjax_script_settings.text = self.extension.getConfig(
+            "mathjax_settings")
+        root.append(mathjax_script_settings)
+
+        mathjax_script = ET.Element("script")
+        mathjax_script.attrib['src'] = self.extension.getConfig("mathjax_src")
+        mathjax_script.attrib['id'] = self.extension.getConfig("mathjax_id")
+        root.append(mathjax_script)
 
         # Reset the boolean switch to false
         self.extension.mathjax_needed = False
 
-        return text + '\n' + self.process_mathjax_script()
-
-    def process_mathjax_script(self):
-        """
-        Load the mathjax script template from file, and render with the settings
-        """
-        jinja_env = {
-            "SRC": self.extension.getConfig('mathjax_src')
-        }
-
-        # Read the mathjax javascript template from file
-        template_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            'mathjax_javascript_template')
-        with open(template_file, 'r') as mathjax_script_template:
-            mathjax_template = mathjax_script_template.read()
-
-        template = Template(mathjax_template)
-
-        return template.render(**jinja_env)
+        return root
 
 
 class Md4MathjaxExtension(Extension):
@@ -84,12 +96,19 @@ class Md4MathjaxExtension(Extension):
                           "The class of the tag in which math is wrapped"],
             "mathjax_src": [
                 'https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js',
-                "the mathjax src value"]
+                "the mathjax srcipt src value"],
+            "mathjax_id": ['MathJax-script',
+                           'the mathjax script id value'],
+            "mathjax_settings": [DEFUALT_MATHJAX_SETTING,
+                                 'mathjax settings']
         }
         # mainly set config
         super().__init__(**kwargs)
 
         # Used as a flag to determine if javascript needs to be injected
+        self.mathjax_needed = False
+
+    def reset(self):
         self.mathjax_needed = False
 
     def extendMarkdown(self, md):
@@ -128,8 +147,9 @@ class Md4MathjaxExtension(Extension):
             MathJaxInlinePattern(mathjax_display_regex2, 'div', self),
             'mathjax_displayed', 181)
 
-        md.postprocessors.register(MathJaxAddJavaScript(self),
-                                   'mathjax_addjavascript', 0)
+        # InlineProcessor priority is 20, so this one is need lower than 20
+        md.treeprocessors.register(MathJaxAddJavaScript(self),
+                                   'mathjax_addjavascript', 15)
 
 
 def makeExtension(**kwargs):
