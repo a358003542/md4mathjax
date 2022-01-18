@@ -8,7 +8,7 @@ from markdown.treeprocessors import Treeprocessor
 from markdown.inlinepatterns import InlineProcessor
 from markdown.extensions import Extension
 
-DEFUALT_MATHJAX_SETTING = """
+DEFUALT_MATHJAX_SETTING = r"""
 window.MathJax = {
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],

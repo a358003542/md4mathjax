@@ -4,7 +4,7 @@
 from .md4mathjax import Md4MathjaxExtension, makeExtension
 
 __softname__ = 'md4mathjax'
-__version__ = '0.1.1'
+__version__ = '0.1.3'
 
 
 __all__ = [Md4MathjaxExtension]

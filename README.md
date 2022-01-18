@@ -53,7 +53,8 @@ default MathJax-script
 
 default 
 
-```js
+```
+DEFUALT_MATHJAX_SETTING = r"""
 window.MathJax = {
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -66,10 +67,19 @@ window.MathJax = {
     load: ['[tex]/mhchem']
   },
 }
+"""
 ```
+
+In python assign this value do not forget the prefix `r` .
 
 
 ## CHANGELOG
+### 0.1.3
+fix escape issue.
+
+### 0.1.2
+README 
+
 ### 0.1.1
 解决了和toc插件不兼容的问题。
 
