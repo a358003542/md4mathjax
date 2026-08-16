@@ -4,8 +4,7 @@
 import markdown
 
 t_string = r"""
-
-$inline1$
+… the cost is $2.50 for the first one, and $2.00 for each additional one …
 
 \(inline2\)
 

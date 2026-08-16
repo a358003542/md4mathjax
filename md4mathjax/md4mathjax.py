@@ -9,18 +9,7 @@ from markdown.inlinepatterns import InlineProcessor
 from markdown.extensions import Extension
 
 DEFUALT_MATHJAX_SETTING = r"""
-window.MathJax = {
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [["$$", "$$"], ['\\[', '\\]']],
-    packages: {
-      '[+]': ['mhchem']
-    }
-  },
-  loader: {
-    load: ['[tex]/mhchem']
-  },
-}
+window.MathJax = {}
 """
 
 
@@ -28,23 +17,29 @@ class MathJaxInlinePattern(InlineProcessor):
     """
     """
 
-    def __init__(self, pattern, tag, extension):
+    def __init__(self, pattern, extension):
         super().__init__(pattern)
         self.extension = extension
-        self.tag = tag
 
     def handleMatch(self, m, data):
-        el = ET.Element(self.tag)
-        el.set('class', self.extension.getConfig('tag_class'))
-
-        if self.tag == 'div':
-            el.text = '$$' + m.group('math') + '$$'
-        else:
-            el.text = '$' + m.group('math') + '$'
-
+        text = '\\(' + m.group('math') + '\\)'
         self.extension.mathjax_needed = True
+        return text, m.start(0), m.end(0)
 
-        return el, m.start(0), m.end(0)
+
+class MathJaxDisplayPattern(InlineProcessor):
+    """
+    """
+
+    def __init__(self, pattern, extension):
+        super().__init__(pattern)
+        self.extension = extension
+
+    def handleMatch(self, m, data):
+        text = '$$' + m.group('math') + '$$'
+        self.extension.mathjax_needed = True
+        return text, m.start(0), m.end(0)
+
 
 
 class MathJaxAddJavaScript(Treeprocessor):
@@ -90,12 +85,8 @@ class Md4MathjaxExtension(Extension):
 
     def __init__(self, **kwargs):
         self.config = {
-            "auto_insert": [True,
-                            'You may insert yourself in another way?'],
-            "tag_class": ["math",
-                          "The class of the tag in which math is wrapped"],
             "mathjax_src": [
-                'https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js',
+                'https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js',
                 "the mathjax srcipt src value"],
             "mathjax_id": ['MathJax-script',
                            'the mathjax script id value'],
@@ -116,9 +107,6 @@ class Md4MathjaxExtension(Extension):
         self.md = md
 
         # Regex to detect mathjax
-        mathjax_inline_regex1 = r'(?<!\$)\$(?!\$)' \
-                                r'(?P<math>.+?)' \
-                                r'(?<!\$)\$(?!\$)'
         mathjax_inline_regex2 = r'\\\((?P<math>.*?)\\\)'
 
         mathjax_display_regex1 = r'(?<!\$)\$\$(?!\$)' \
@@ -127,24 +115,17 @@ class Md4MathjaxExtension(Extension):
 
         mathjax_display_regex2 = r'\\\[(?P<math>.+?)\\\]'
 
-        md.inlinePatterns.register(
-            MathJaxInlinePattern(mathjax_inline_regex1, 'span', self),
-            'mathjax_inlined1', 184)
-
         # must higher than 180 for before the markdown EscapeInlineProcessor
-        # and must lower than mathjax_inlined1
         md.inlinePatterns.register(
-            MathJaxInlinePattern(mathjax_inline_regex2, 'span', self),
+            MathJaxInlinePattern(mathjax_inline_regex2, self),
             'mathjax_inlined2', 183)
 
         md.inlinePatterns.register(
-            MathJaxInlinePattern(mathjax_display_regex1, 'div', self),
+            MathJaxDisplayPattern(mathjax_display_regex1, self),
             'mathjax_displayed1', 182)
 
-        # must higher than 180 for before the markdown EscapeInlineProcessor
-        # and must lower than mathjax_inlined1
         md.inlinePatterns.register(
-            MathJaxInlinePattern(mathjax_display_regex2, 'div', self),
+            MathJaxDisplayPattern(mathjax_display_regex2, self),
             'mathjax_displayed', 181)
 
         # InlineProcessor priority is 20, so this one is need lower than 20

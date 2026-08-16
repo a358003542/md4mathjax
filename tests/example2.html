@@ -8,13 +8,18 @@
 </head>
 <body>
 <h2>mathjax example</h2>
-<p>… the cost is $2.50 for the first one, and $2.00 for each additional one …</p>
+<p>… the cost is \$2.50 for the first one, and \$2.00 for each additional one …</p>
+<p>$\frac{ a }{ b}$</p>
 <p>When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are
   $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</p>
 <hr />
 <script>
-window.MathJax = {}
-</script>
+                                     window.MathJax = {
+                                          tex: {
+                                            inlineMath: {'[+]': [['$', '$']]}
+                                          }
+                                        };
+                                     </script>
 <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
 </body>
 </html>
